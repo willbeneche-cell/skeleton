@@ -1,0 +1,198 @@
+return function(state)
+    if not state then return end
+
+    local Player = game:GetService("Players").LocalPlayer
+    local Camera = workspace.CurrentCamera
+
+    local function DrawLine()
+        local l = Drawing.new("Line")
+        l.Visible = false
+        l.From = Vector2.new(0, 0)
+        l.To = Vector2.new(1, 1)
+        l.Color = Color3.fromRGB(3, 143, 254) -- BLEU
+        l.Thickness = 1
+        l.Transparency = 1
+        return l
+    end
+    local function DrawESP(plr)
+        repeat wait() until plr.Character and plr.Character:FindFirstChild("Humanoid")
+        local limbs = {}
+        local R15 = (plr.Character.Humanoid.RigType == Enum.HumanoidRigType.R15)
+
+        if R15 then
+            limbs = {
+                Head_UpperTorso = DrawLine(),
+                UpperTorso_LowerTorso = DrawLine(),
+                UpperTorso_LeftUpperArm = DrawLine(),
+                LeftUpperArm_LeftLowerArm = DrawLine(),
+                LeftLowerArm_LeftHand = DrawLine(),
+                UpperTorso_RightUpperArm = DrawLine(),
+                RightUpperArm_RightLowerArm = DrawLine(),
+                RightLowerArm_RightHand = DrawLine(),
+                LowerTorso_LeftUpperLeg = DrawLine(),
+                LeftUpperLeg_LeftLowerLeg = DrawLine(),
+                LeftLowerLeg_LeftFoot = DrawLine(),
+                LowerTorso_RightUpperLeg = DrawLine(),
+                RightUpperLeg_RightLowerLeg = DrawLine(),
+                RightLowerLeg_RightFoot = DrawLine(),
+            }
+        else
+            limbs = {
+                Head_Spine = DrawLine(),
+                Spine = DrawLine(),
+                LeftArm = DrawLine(),
+                LeftArm_UpperTorso = DrawLine(),
+                RightArm = DrawLine(),
+                RightArm_UpperTorso = DrawLine(),
+                LeftLeg = DrawLine(),
+                LeftLeg_LowerTorso = DrawLine(),
+                RightLeg = DrawLine(),
+                RightLeg_LowerTorso = DrawLine()
+            }
+        end
+
+        local function Visibility(state)
+            for _, v in pairs(limbs) do
+                v.Visible = state
+            end
+        end
+        local function UpdaterR15()
+            local connection
+            connection = game:GetService("RunService").RenderStepped:Connect(function()
+                local char = plr.Character
+                if char and char:FindFirstChild("Humanoid") and char:FindFirstChild("HumanoidRootPart") and char.Humanoid.Health > 0 then
+                    local _, vis = Camera:WorldToViewportPoint(char.HumanoidRootPart.Position)
+                    if vis then
+                        local function wp(part)
+                            local pos = Camera:WorldToViewportPoint(part.Position)
+                            return Vector2.new(pos.X, pos.Y)
+                        end
+
+                        limbs.Head_UpperTorso.From = wp(char.Head)
+                        limbs.Head_UpperTorso.To = wp(char.UpperTorso)
+                        limbs.UpperTorso_LowerTorso.From = wp(char.UpperTorso)
+                        limbs.UpperTorso_LowerTorso.To = wp(char.LowerTorso)
+
+                        limbs.UpperTorso_LeftUpperArm.From = wp(char.UpperTorso)
+                        limbs.UpperTorso_LeftUpperArm.To = wp(char.LeftUpperArm)
+                        limbs.LeftUpperArm_LeftLowerArm.From = wp(char.LeftUpperArm)
+                        limbs.LeftUpperArm_LeftLowerArm.To = wp(char.LeftLowerArm)
+                        limbs.LeftLowerArm_LeftHand.From = wp(char.LeftLowerArm)
+                        limbs.LeftLowerArm_LeftHand.To = wp(char.LeftHand)
+
+                        limbs.UpperTorso_RightUpperArm.From = wp(char.UpperTorso)
+                        limbs.UpperTorso_RightUpperArm.To = wp(char.RightUpperArm)
+                        limbs.RightUpperArm_RightLowerArm.From = wp(char.RightUpperArm)
+                        limbs.RightUpperArm_RightLowerArm.To = wp(char.RightLowerArm)
+                        limbs.RightLowerArm_RightHand.From = wp(char.RightLowerArm)
+                        limbs.RightLowerArm_RightHand.To = wp(char.RightHand)
+
+                        limbs.LowerTorso_LeftUpperLeg.From = wp(char.LowerTorso)
+                        limbs.LowerTorso_LeftUpperLeg.To = wp(char.LeftUpperLeg)
+                        limbs.LeftUpperLeg_LeftLowerLeg.From = wp(char.LeftUpperLeg)
+                        limbs.LeftUpperLeg_LeftLowerLeg.To = wp(char.LeftLowerLeg)
+                        limbs.LeftLowerLeg_LeftFoot.From = wp(char.LeftLowerLeg)
+                        limbs.LeftLowerLeg_LeftFoot.To = wp(char.LeftFoot)
+
+                        limbs.LowerTorso_RightUpperLeg.From = wp(char.LowerTorso)
+                        limbs.LowerTorso_RightUpperLeg.To = wp(char.RightUpperLeg)
+                        limbs.RightUpperLeg_RightLowerLeg.From = wp(char.RightUpperLeg)
+                        limbs.RightUpperLeg_RightLowerLeg.To = wp(char.RightLowerLeg)
+                        limbs.RightLowerLeg_RightFoot.From = wp(char.RightLowerLeg)
+                        limbs.RightLowerLeg_RightFoot.To = wp(char.RightFoot)
+
+                        Visibility(true)
+                    else
+                        Visibility(false)
+                    end
+                else
+                    Visibility(false)
+                    if not game.Players:FindFirstChild(plr.Name) then
+                        for _, v in pairs(limbs) do v:Remove() end
+                        connection:Disconnect()
+                    end
+                end
+            end)
+        end
+        local function UpdaterR6()
+            local connection
+            connection = game:GetService("RunService").RenderStepped:Connect(function()
+                local char = plr.Character
+                if char and char:FindFirstChild("Humanoid") and char:FindFirstChild("HumanoidRootPart") and char.Humanoid.Health > 0 then
+                    local _, vis = Camera:WorldToViewportPoint(char.HumanoidRootPart.Position)
+                    if vis then
+                        local function wp(part, offset)
+                            local pos = Camera:WorldToViewportPoint((part.CFrame * offset).Position)
+                            return Vector2.new(pos.X, pos.Y)
+                        end
+
+                        local T = char.Torso
+                        local LA = char["Left Arm"]
+                        local RA = char["Right Arm"]
+                        local LL = char["Left Leg"]
+                        local RL = char["Right Leg"]
+
+                        local T_Height = T.Size.Y / 2 - 0.2
+                        local LA_Height = LA.Size.Y / 2 - 0.2
+                        local RA_Height = RA.Size.Y / 2 - 0.2
+                        local LL_Height = LL.Size.Y / 2 - 0.2
+                        local RL_Height = RL.Size.Y / 2 - 0.2
+
+                        limbs.Head_Spine.From = wp(char.Head, CFrame.new(0, 0, 0))
+                        limbs.Head_Spine.To = wp(T, CFrame.new(0, T_Height, 0))
+                        limbs.Spine.From = wp(T, CFrame.new(0, T_Height, 0))
+                        limbs.Spine.To = wp(T, CFrame.new(0, -T_Height, 0))
+
+                        limbs.LeftArm.From = wp(LA, CFrame.new(0, LA_Height, 0))
+                        limbs.LeftArm.To = wp(LA, CFrame.new(0, -LA_Height, 0))
+                        limbs.LeftArm_UpperTorso.From = wp(T, CFrame.new(0, T_Height, 0))
+                        limbs.LeftArm_UpperTorso.To = wp(LA, CFrame.new(0, LA_Height, 0))
+
+                        limbs.RightArm.From = wp(RA, CFrame.new(0, RA_Height, 0))
+                        limbs.RightArm.To = wp(RA, CFrame.new(0, -RA_Height, 0))
+                        limbs.RightArm_UpperTorso.From = wp(T, CFrame.new(0, T_Height, 0))
+                        limbs.RightArm_UpperTorso.To = wp(RA, CFrame.new(0, RA_Height, 0))
+
+                        limbs.LeftLeg.From = wp(LL, CFrame.new(0, LL_Height, 0))
+                        limbs.LeftLeg.To = wp(LL, CFrame.new(0, -LL_Height, 0))
+                        limbs.LeftLeg_LowerTorso.From = wp(T, CFrame.new(0, -T_Height, 0))
+                        limbs.LeftLeg_LowerTorso.To = wp(LL, CFrame.new(0, LL_Height, 0))
+
+                        limbs.RightLeg.From = wp(RL, CFrame.new(0, RL_Height, 0))
+                        limbs.RightLeg.To = wp(RL, CFrame.new(0, -RL_Height, 0))
+                        limbs.RightLeg_LowerTorso.From = wp(T, CFrame.new(0, -T_Height, 0))
+                        limbs.RightLeg_LowerTorso.To = wp(RL, CFrame.new(0, RL_Height, 0))
+
+                        Visibility(true)
+                    else
+                        Visibility(false)
+                    end
+                else
+                    Visibility(false)
+                    if not game.Players:FindFirstChild(plr.Name) then
+                        for _, v in pairs(limbs) do v:Remove() end
+                        connection:Disconnect()
+                    end
+                end
+            end)
+        end
+
+        if R15 then
+            coroutine.wrap(UpdaterR15)()
+        else
+            coroutine.wrap(UpdaterR6)()
+        end
+    end
+
+    for _, v in ipairs(game:GetService("Players"):GetPlayers()) do
+        if v ~= Player then
+            DrawESP(v)
+        end
+    end
+
+    game:GetService("Players").PlayerAdded:Connect(function(newplr)
+        if newplr ~= Player then
+            DrawESP(newplr)
+        end
+    end)
+end
