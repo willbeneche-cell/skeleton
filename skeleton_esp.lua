@@ -1,13 +1,9 @@
-return function(state)
-    local drawings = {}
-    local connections = {}
-
+local function skeletonESP(state)
     if not state then
-        for _, d in ipairs(drawings) do
-            pcall(function() d:Remove() end)
-        end
-        for _, c in ipairs(connections) do
-            pcall(function() c:Disconnect() end)
+        for _, obj in ipairs(getgc(true)) do
+            if typeof(obj) == "Instance" and obj:IsA("Drawing") then
+                obj:Remove()
+            end
         end
         return
     end
@@ -23,7 +19,6 @@ return function(state)
         l.Color = Color3.fromRGB(3, 143, 254)
         l.Thickness = 1
         l.Transparency = 1
-        table.insert(drawings, l)
         return l
     end
 
@@ -166,16 +161,22 @@ return function(state)
                     end
                 end
             end)
-            table.insert(connections, conn)
         end
 
         coroutine.wrap(Updater)()
     end
 
-    for _, v in ipairs(game:GetService("Players"):GetPlayers()) do
+    for _, v in ipairs(game.Players:GetPlayers()) do
         if v ~= Player then
             DrawESP(v)
         end
     end
 
-    game:GetService("Players").PlayerAdded:
+    game.Players.PlayerAdded:Connect(function(newplr)
+        if newplr ~= Player then
+            DrawESP(newplr)
+        end
+    end)
+end
+
+return skeletonESP
